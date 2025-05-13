@@ -9,36 +9,34 @@ config();
 
 async function main() {
     try {
-        let shape_api_key = process.env.SHAPESINC_API_KEY;
-        let shape_app_id = process.env.SHAPESINC_APP_ID;
-        let shape_username = process.env.SHAPESINC_SHAPE_USERNAME;
+        const shape_api_key = process.env.SHAPESINC_API_KEY;
+        const shape_username = process.env.SHAPESINC_SHAPE_USERNAME;
 
-        // Check for SHAPESINC_API_KEY in .env
+        // Check for required environment variables
         if (!shape_api_key) {
             throw new Error("SHAPESINC_API_KEY not found in .env");
         }
 
-        // Check for SHAPESINC_APP_ID in .env
-        if (!shape_app_id) {
-            // Default app ID for Euclidian - the Shapes API testing app
-            shape_app_id = "f6263f80-2242-428d-acd4-10e1feec44ee"
-        }
-
-        // Check for SHAPESINC_SHAPE_USERNAME in .env
         if (!shape_username) {
-            // Default shape username for Shape Robot - the Shapes API developer shape
-            shape_username = "shaperobot"
+            throw new Error("SHAPESINC_SHAPE_USERNAME not found in .env");
         }
 
-        const model = `shapesinc/${shape_username}`;
-
-        // Create readline interface for command-line input
+     
         const rl = readline.createInterface({
             input: process.stdin,
             output: process.stdout
         });
 
-        // Function to send message to the Shapes API
+        // Typing effect function to emulate streaming
+        async function streamTextToTerminal(text, delay = 40) { // adjust based on your requirements
+            for (const char of text) {
+                process.stdout.write(char);
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+            process.stdout.write('\n');
+        }
+
+        // Send message to Shapes API and emulate streaming response
         async function sendMessage(text) {
             try {
                 const response = await axios.post(
@@ -55,24 +53,23 @@ async function main() {
                     }
                 );
 
-                console.log("Raw response:", response.data);
-
                 if (response.data.choices && response.data.choices.length > 0) {
-                    console.log("Reply:", response.data.choices[0].message.content);
+                    const message = response.data.choices[0].message.content;
+                    await streamTextToTerminal(message);
                 } else {
                     console.log("No choices in response:", response.data);
                 }
             } catch (error) {
                 console.error(
                     "Error:",
-                    error.response ? `${error.response.status} - ${error.response.data}` : error.message
+                    error.response ? `${error.response.status} - ${JSON.stringify(error.response.data)}` : error.message
                 );
             }
         }
 
-        // Function to prompt user for input
+    
         function promptUser() {
-            rl.question("Enter your message (or type 'exit' to quit): ", async (input) => {
+            rl.question("You: ", async (input) => {
                 if (input.toLowerCase() === "exit") {
                     rl.close();
                     return;
@@ -88,15 +85,16 @@ async function main() {
             });
         }
 
-        // Start the app
-        console.log("Chat API App - Type a message to send to the Shapes API.");
+    
+        console.log("🔷 Shapes API Chat (Type 'exit' to quit)");
         promptUser();
 
-        // Handle readline close
+ 
         rl.on("close", () => {
-            console.log("Exiting app.");
+            console.log("\nExiting chat.");
             process.exit(0);
         });
+
     } catch (error) {
         console.error("Error:", error.message);
     }
