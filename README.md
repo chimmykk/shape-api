@@ -68,6 +68,31 @@ const response = await shapes_client.chat.completions.create({
 console.log(response);
 ```
 
+### C#
+```csharp
+using OpenAI;
+
+var client = new ChatClient(
+    "shapesinc/<shape-username>",
+    new ApiKeyCredential("<your-API-key>"),
+    new OpenAIClientOptions { Endpoint = new Uri("https://api.shapes.inc/v1/") }
+);
+
+var chatMessages = new List<ChatMessage>();
+
+chatMessages.Add(new UserChatMessage.ChatMessageContentPart.CreateTextPart("Hello!"));
+// or:
+chatMessages.Add(new UserChatMessage.ChatMessageContentPart
+	.CreateTextPart("""{"role": "user", "content": "Hello!"}"""));
+
+var completion = await client.CompleteChatAsync(chatMessages);
+
+Console.WriteLine(completion.Value.Content[0].Text)
+// or:
+foreach (var content in completion.Value.Content)
+	Console.WriteLine(content.Text)
+```
+
 ### 🔄 CURL
 
 ```bash
@@ -109,13 +134,15 @@ Shapes now support the following commands:
 
 ## Advanced Features
 
-| Feature | Details |
-|---------|---------|
-| Vision Support | Send OpenAI API compatible image_url with user messages |
-| Tool Calling | Shapes now support tool calling and MCP functionality |
-| Voice Features | Free voice for all shapes (custom or pre-made voices via shapes.inc) |
-| Voice Configuration | Option to disable voice transcripts (set via shapes.inc) |
-| Voice Formatting | Improved formatting for voice URLs with new line separation |
+| Feature                    | Details                                                                 |
+| -------------------------- | ----------------------------------------------------------------------- |
+| Vision Support             | Send OpenAI API-compatible `image_url` with user messages.              |
+| Voice Recognition          | Send OpenAI API-compatible `audio_url` with user messages.              |
+| Tool Calling               | Shapes now support tool calling and MCP functionality.                  |
+| Voice Features             | Free voice for all shapes (custom or pre-made voices via `shapes.inc`). |
+| Voice Configuration        | Option to disable voice transcripts (set via `shapes.inc`).             |
+| Voice Formatting           | Improved formatting for voice URLs with newline separation.             |
+| Authentication with Shapes | You can now authenticate with `shapes.inc` via your app.                |
 
 
 ## API Multimodal Support
@@ -196,11 +223,11 @@ Note: Shapes set on Premium Engines **WILL** use credits when accessed via API.
 - [x] IRC
 - [x] Chess
 - [x] Voice
+- [x] GitHub (to review PRs)
 
 ## Requested Integrations
 We're looking for developer contributions to build:
 - [ ] Reddit
-- [ ] GitHub (to review PRs)
 - [ ] Threads
 - [ ] Roblox
 - [ ] Minecraft
