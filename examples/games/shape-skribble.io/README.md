@@ -2,6 +2,12 @@
 
 An automated bot that plays Skribbl.io using AI vision and drawing capabilities.
 
+
+
+https://github.com/user-attachments/assets/82f0d301-97ba-4461-85a3-979c644d0fa6
+
+
+
 ## Features
 
 - **AI Vision**: Analyzes game screenshots to understand current state
