@@ -3,9 +3,7 @@
 [![image](https://github.com/user-attachments/assets/e98592ca-3b1d-4709-93c6-7e6aa0dfb84a)](https://shapes.inc/slack)
 
 
-[Shapes](https://shapes.inc) are general purpose social agents. You can build for an [existing shape](https://shapes.inc/explore) from our catalogue of millions or [create](https://shapes.inc/create) your own. Shapes have rich personalities, love hanging out in groupchats, and short-term + long-term memory across platforms.
-
-The Shapes API enables developers to connect Shapes across social platforms, games, and other applications. Shapes can meet you anywhere, from your favorite social app or a new project. You can configure a Shape to use some of 50+ models we offer for free across text, image, and voice.
+[Shapes](https://shapes.inc) are general purpose social agents. You can build for an [existing shape](https://shapes.inc/explore) from our catalogue of millions or [create](https://shapes.inc/create) your own. Shapes have rich personalities, love hanging out in groupchats, and short-term + long-term memory across platforms. You can configure a Shape to use some of 50+ models we offer for free across text, image, and voice.
 
 ## Open Source Contributions
 Our API is designed with extensibility as a core principle. You can extend any Shape for tool calling, MCP, and more.
@@ -15,28 +13,16 @@ Star and contribute to this repository to receive free hosting for your integrat
 ## What is the Shapes API?
 Shapes API provides a programmatic way to integrate Shapes into any application or platform. It follows the OpenAI-compatible API standard, making it easy to implement with existing libraries and SDKs.
 
-To learn more about implementing Shapes in your app, check out our [examples repository](https://github.com/shapesinc/api).
+## Demos
+To get a sense of what’s possible, see what people have already built: 
 
-## Features
-
-Shapes API comes with many features that you won’t find in general APIs. Here's a quick overview:
-
-### Memories
-Shapes API supports cross-platform, long-term and short-term memory! Shapes will automatically reference relevant memories across sessions.
-
-### Image Generation
-You can generate images directly through Shapes API — just use the `!imagine` command or the relevant endpoint.
-
-### 50+ Models
-Access all trending LLMs including GPT-4.1, Claude Sonnet 3.7, Gemini 2.5 Pro, and more — all through a single API. Models can be configured in the AI Engine tab on the selected Shape's dashboard.
-
-### Voice Generation
-Shapes API supports voice messages. Configure your integration to send back audio replies using the built-in voice features.
-
-Check out the examples in the repo to learn how to use each of these features in your integration!
+- Omegle with Shapes https://omegle-ai.vercel.app by [@khawajapartners](https://github.com/zahidkhawaja)
+- Playing Chess with Shapes https://shapeschess.vercel.app by [@kiyosh11](https://github.com/kiyosh11)
+- Shapes on Telegram https://t.me/shapesinc by [@missParadoxical](https://github.com/missParadoxical)
+- Shapes on WhatsApp at +1 (424) 452-2786 by [@anushkmittal](https://github.com/anushkmittal)
 
 ## Getting Started
-You will need to generate an API Key. Every API Key is tied to a specific Shape. Get yours [here](https://shapes.inc/developer)
+You will need to generate an API Key. Get yours [here](https://shapes.inc/developer)
 
 <img width="807" alt="API Key Generation" src="https://github.com/user-attachments/assets/ead6f28a-300b-4dcf-a555-313b39656ad6" />
 
@@ -65,7 +51,7 @@ print(response)
 ### 🌐 JavaScript
 
 ```javascript
-const openai = require("openai");
+const { OpenAI } = require("openai");
 
 const shapes_client = new OpenAI({
     apiKey: "<your-API-key>",
@@ -80,6 +66,26 @@ const response = await shapes_client.chat.completions.create({
 });
 
 console.log(response);
+```
+
+### C#
+```csharp
+using OpenAI;
+
+var client = new ChatClient(
+    "shapesinc/<shape-username>",
+    new ApiKeyCredential("<your-API-key>"),
+    new OpenAIClientOptions { Endpoint = new Uri("https://api.shapes.inc/v1/") }
+);
+
+var chatMessages = new List<ChatMessage>();
+
+chatMessages.Add(new UserChatMessage.ChatMessageContentPart
+	.CreateTextPart("""{"role": "user", "content": "Hello!"}"""));
+
+var completion = await client.CompleteChatAsync(chatMessages);
+
+Console.WriteLine(completion.Value.Content[0].Text);
 ```
 
 ### 🔄 CURL
@@ -105,9 +111,26 @@ curl -X POST https://api.shapes.inc/v1/chat/completions \
 | Feature | Details |
 |---------|---------|
 | Endpoints | `/chat/completions` |
-| Rate Limits | 5 RPM (request increase [here](https://docs.google.com/forms/d/e/1FAIpQLScGLeRk6snViRPslXbbUaMDwubcBhmcJ6opq7wFvPEp-EbO3g/viewform)) |
+| Rate Limits | 20 RPM (request increase [here](https://docs.google.com/forms/d/e/1FAIpQLScGLeRk6snViRPslXbbUaMDwubcBhmcJ6opq7wFvPEp-EbO3g/viewform)) |
 | Headers | `X-User-Id` for user identification, `X-Channel-Id` for conversation context |
 | Response Format | Standard OpenAI-compatible JSON response |
+
+## User Identification and Authorization
+
+### Custom Headers
+Shapes API supports two types of custom headers:
+
+1. `X-User-Id` for user identification - We HIGHLY recommend using custom headers whenever you're using the Shapes API in a user-facing project. By default, the Shapes API treats a user as the person who generated the API key. This can result in conversation context mix-ups and other risks, such as shape memory loss if a user uses the `!reset` command on the API.
+
+2. `X-Channel-Id` for conversation context - Using this header is recommended for projects that support more than one conversation context per user.
+
+You can find custom header examples [HERE](https://github.com/shapesinc/shapes-api/blob/main/LLMS.txt).
+
+### Shapes Inc Authorization
+
+While custom headers anonymize users, Shapes authorization connects the shapes to the user's shapes.inc account. This way, the memory of conversations with shapes on the API is saved to the user's account, and the shape identifies the user by their shapes.inc name. This feature also allows you to use user personas available on shapes.inc.
+
+You can learn more and review examples [HERE](https://github.com/shapesinc/shapes-api/tree/main/examples/websites/shape-auth-example).
 
 ## Supported Commands
 
@@ -123,13 +146,15 @@ Shapes now support the following commands:
 
 ## Advanced Features
 
-| Feature | Details |
-|---------|---------|
-| Vision Support | Send OpenAI API compatible image_url with user messages |
-| Tool Calling | Shapes now support tool calling and MCP functionality |
-| Voice Features | Free voice for all shapes (custom or pre-made voices via shapes.inc) |
-| Voice Configuration | Option to disable voice transcripts (set via shapes.inc) |
-| Voice Formatting | Improved formatting for voice URLs with new line separation |
+| Feature                    | Details                                                                 |
+| -------------------------- | ----------------------------------------------------------------------- |
+| Vision Support             | Send OpenAI API-compatible `image_url` with user messages.              |
+| Voice Recognition          | Send OpenAI API-compatible `audio_url` with user messages.              |
+| Tool Calling               | Shapes now support tool calling and MCP functionality.                  |
+| Voice Features             | Free voice for all shapes (custom or pre-made voices via `shapes.inc`). |
+| Voice Configuration        | Option to disable voice transcripts (set via `shapes.inc`).             |
+| Voice Formatting           | Improved formatting for voice URLs with newline separation.             |
+| Authentication with Shapes | You can now authenticate with `shapes.inc` via your app.                |
 
 
 ## API Multimodal Support
@@ -210,15 +235,15 @@ Note: Shapes set on Premium Engines **WILL** use credits when accessed via API.
 - [x] IRC
 - [x] Chess
 - [x] Voice
+- [x] Twitch
+- [x] GitHub (to review PRs)
 
 ## Requested Integrations
 We're looking for developer contributions to build:
 - [ ] Reddit
-- [ ] GitHub (to review PRs)
 - [ ] Threads
 - [ ] Roblox
 - [ ] Minecraft
-- [ ] Twitch
 - [ ] LinkedIn
 - [ ] Microsoft Teams
 - [ ] WeChat
@@ -234,8 +259,6 @@ We are shipping new features to the Shapes API every day. Next on our list is:
 
 | Feature | Details |
 |------------|---------|
-| Voice Recognition | Shapes can send voice messages but not hear any yet |
-| Authorize with Shapes, Inc | Authenticate users via a shapes inc account |
 | Free Will | Proactively take actions |
 | Messaging first | Shapes can't talk first...yet |
 
