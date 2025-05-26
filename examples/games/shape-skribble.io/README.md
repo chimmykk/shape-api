@@ -35,7 +35,7 @@ https://github.com/user-attachments/assets/82f0d301-97ba-4461-85a3-979c644d0fa6
 1. Update the Skribbl.io room URL in the code (currently set to a specific room)
 2. Run the bot:
    ```bash
-   node skribbl-bot.js
+   node main.js
    ```
 3. The bot will automatically join the game and start playing
 
