@@ -51,7 +51,7 @@ print(response)
 ### 🌐 JavaScript
 
 ```javascript
-const openai = require("openai");
+const { OpenAI } = require("openai");
 
 const shapes_client = new OpenAI({
     apiKey: "<your-API-key>",
@@ -66,6 +66,26 @@ const response = await shapes_client.chat.completions.create({
 });
 
 console.log(response);
+```
+
+### C#
+```csharp
+using OpenAI;
+
+var client = new ChatClient(
+    "shapesinc/<shape-username>",
+    new ApiKeyCredential("<your-API-key>"),
+    new OpenAIClientOptions { Endpoint = new Uri("https://api.shapes.inc/v1/") }
+);
+
+var chatMessages = new List<ChatMessage>();
+
+chatMessages.Add(new UserChatMessage.ChatMessageContentPart
+	.CreateTextPart("""{"role": "user", "content": "Hello!"}"""));
+
+var completion = await client.CompleteChatAsync(chatMessages);
+
+Console.WriteLine(completion.Value.Content[0].Text);
 ```
 
 ### 🔄 CURL
@@ -91,9 +111,26 @@ curl -X POST https://api.shapes.inc/v1/chat/completions \
 | Feature | Details |
 |---------|---------|
 | Endpoints | `/chat/completions` |
-| Rate Limits | 5 RPM (request increase [here](https://docs.google.com/forms/d/e/1FAIpQLScGLeRk6snViRPslXbbUaMDwubcBhmcJ6opq7wFvPEp-EbO3g/viewform)) |
+| Rate Limits | 20 RPM (request increase [here](https://docs.google.com/forms/d/e/1FAIpQLScGLeRk6snViRPslXbbUaMDwubcBhmcJ6opq7wFvPEp-EbO3g/viewform)) |
 | Headers | `X-User-Id` for user identification, `X-Channel-Id` for conversation context |
 | Response Format | Standard OpenAI-compatible JSON response |
+
+## User Identification and Authorization
+
+### Custom Headers
+Shapes API supports two types of custom headers:
+
+1. `X-User-Id` for user identification - We HIGHLY recommend using custom headers whenever you're using the Shapes API in a user-facing project. By default, the Shapes API treats a user as the person who generated the API key. This can result in conversation context mix-ups and other risks, such as shape memory loss if a user uses the `!reset` command on the API.
+
+2. `X-Channel-Id` for conversation context - Using this header is recommended for projects that support more than one conversation context per user.
+
+You can find custom header examples [HERE](https://github.com/shapesinc/shapes-api/blob/main/LLMS.txt).
+
+### Shapes Inc Authorization
+
+While custom headers anonymize users, Shapes authorization connects the shapes to the user's shapes.inc account. This way, the memory of conversations with shapes on the API is saved to the user's account, and the shape identifies the user by their shapes.inc name. This feature also allows you to use user personas available on shapes.inc.
+
+You can learn more and review examples [HERE](https://github.com/shapesinc/shapes-api/tree/main/examples/websites/shape-auth-example).
 
 ## Supported Commands
 
@@ -109,13 +146,15 @@ Shapes now support the following commands:
 
 ## Advanced Features
 
-| Feature | Details |
-|---------|---------|
-| Vision Support | Send OpenAI API compatible image_url with user messages |
-| Tool Calling | Shapes now support tool calling and MCP functionality |
-| Voice Features | Free voice for all shapes (custom or pre-made voices via shapes.inc) |
-| Voice Configuration | Option to disable voice transcripts (set via shapes.inc) |
-| Voice Formatting | Improved formatting for voice URLs with new line separation |
+| Feature                    | Details                                                                 |
+| -------------------------- | ----------------------------------------------------------------------- |
+| Vision Support             | Send OpenAI API-compatible `image_url` with user messages.              |
+| Voice Recognition          | Send OpenAI API-compatible `audio_url` with user messages.              |
+| Tool Calling               | Shapes now support tool calling and MCP functionality.                  |
+| Voice Features             | Free voice for all shapes (custom or pre-made voices via `shapes.inc`). |
+| Voice Configuration        | Option to disable voice transcripts (set via `shapes.inc`).             |
+| Voice Formatting           | Improved formatting for voice URLs with newline separation.             |
+| Authentication with Shapes | You can now authenticate with `shapes.inc` via your app.                |
 
 
 ## API Multimodal Support
@@ -196,15 +235,15 @@ Note: Shapes set on Premium Engines **WILL** use credits when accessed via API.
 - [x] IRC
 - [x] Chess
 - [x] Voice
+- [x] Twitch
+- [x] GitHub (to review PRs)
 
 ## Requested Integrations
 We're looking for developer contributions to build:
 - [ ] Reddit
-- [ ] GitHub (to review PRs)
 - [ ] Threads
 - [ ] Roblox
 - [ ] Minecraft
-- [ ] Twitch
 - [ ] LinkedIn
 - [ ] Microsoft Teams
 - [ ] WeChat
@@ -220,8 +259,6 @@ We are shipping new features to the Shapes API every day. Next on our list is:
 
 | Feature | Details |
 |------------|---------|
-| Voice Recognition | Shapes can send voice messages but not hear any yet |
-| Authorize with Shapes, Inc | Authenticate users via a shapes inc account |
 | Free Will | Proactively take actions |
 | Messaging first | Shapes can't talk first...yet |
 
